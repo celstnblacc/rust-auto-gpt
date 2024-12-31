@@ -1,16 +1,16 @@
 use crate::apis::call_request::call_gpt;
 use crate::helpers::command_line::PrintCommand;
-use crate::models::general::llm::{self, Message};
+use crate::models::general::llm::{Message};
 use reqwest::Client;
 use serde::de::DeserializeOwned;
 use std::fs;
 
 const CODE_TEMPLATE_PATH: &str =
-    "/Users/macair15/Documents/DevOpsCelstn/RustAutoGPT/web_template/src/code_template.rs";
+    "/Users/macair15/Documents/DevOpsCelstn/RustAutoGPT_UDEMY/web_template/src/code_template.rs";
 const EXEC_MAIN_PATH: &str =
-    "/Users/macair15/Documents/DevOpsCelstn/RustAutoGPT/web_template/src/main.rs";
+    "/Users/macair15/Documents/DevOpsCelstn/RustAutoGPT_UDEMY/web_template/src/main.rs";
 const API_SCHEMA_PATH: &str =
-    "/Users/macair15/Documents/DevOpsCelstn/RustAutoGPT/auto_gippity/schamas/api_schema.json";
+    "/Users/macair15/Documents/DevOpsCelstn/RustAutoGPT_UDEMY/rust-auto-gpt/schemas/api_schema.json";
 
 pub fn extend_ai_function(ai_funct: fn(&str) -> &'static str, func_input: &str) -> Message {
     let ai_function_str = ai_funct(func_input);
@@ -90,17 +90,20 @@ pub async fn check_status_code(client: &Client, url: &str) -> Result<u16, reqwes
     Ok(response.status().as_u16())
 }
 
-// // Get Code Template
-// pub fn read_code_template_contents() -> String {
-//     let path: String = String::from(CODE_TEMPLATE_PATH);
-//     fs::read_to_string(path).expect("Failed to read code template")
-// }
+// Get Code Template
+// Get Code Template
+pub fn read_code_template_contents() -> String {
+    let path: String = String::from(CODE_TEMPLATE_PATH);
+    std::fs::read_to_string(path.clone()).unwrap_or_else(|_| {
+        panic!("The file at '{}' is missing. Please create the file and try again.", path)
+    })
+}
 
-// // Get Exec Main
-// pub fn read_exec_main_contents() -> String {
-//     let path: String = String::from(EXEC_MAIN_PATH);
-//     fs::read_to_string(path).expect("Failed to read code template")
-// }
+// Get Exec Main
+pub fn read_exec_main_contents() -> String {
+    let path: String = String::from(EXEC_MAIN_PATH);
+    fs::read_to_string(path).expect("Failed to read code template")
+}
 
 // Save new backend code
 pub fn save_backend_code(contents: &String) {

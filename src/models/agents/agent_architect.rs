@@ -13,7 +13,7 @@ use std::time::Duration;
 // 105 1:45
 #[derive(Debug)]
 pub struct AgentSolutionArchitect {
-    attributes: BasicAgent
+    attributes: BasicAgent,
 }
 
 impl AgentSolutionArchitect {
@@ -65,14 +65,12 @@ impl AgentSolutionArchitect {
     }
 }
 
-
 // 107. Solutions Architect - Handle discovery state
 #[async_trait]
 impl SpecialFunctions for AgentSolutionArchitect {
     fn get_attributes_from_agent(&self) -> &BasicAgent {
         &self.attributes
     }
-
 
     async fn execute(
         &mut self,
@@ -84,7 +82,9 @@ impl SpecialFunctions for AgentSolutionArchitect {
             match self.attributes.state {
                 // if state is discovery
                 AgentState::Discovery => {
-                    println!(" ==================== AgentState::Discovery (src/models/agents/agent_architect.rs) ===================== ");
+                    println!(
+                        " ==================== AgentState::Discovery (src/models/agents/agent_architect.rs) ===================== "
+                    );
                     // 107. (5:50)
                     let project_scope: ProjectScope = self.call_project_scope(factsheet).await;
 
@@ -96,15 +96,19 @@ impl SpecialFunctions for AgentSolutionArchitect {
                         )
                         .await;
                         // Yes is external urls, move to unit testing
-                        println!(" ==== Yes is external urls (AgentState::Discovery), move to unit testing "); // 109 8:35
+                        println!(
+                            " ==== Yes is external urls (AgentState::Discovery), move to unit testing "
+                        ); // 109 8:35
                         self.attributes.state = AgentState::UnitTesting;
                     }
                 }
-                
+
                 // 108.
                 // if state is unit testing
-                AgentState::UnitTesting => { 
-                    println!(" ==================== AgentState::UnitTesting (src/models/agents/agent_architect.rs) ===================== "); // 109. 8:14
+                AgentState::UnitTesting => {
+                    println!(
+                        " ==================== AgentState::UnitTesting (src/models/agents/agent_architect.rs) ===================== "
+                    ); // 109. 8:14
                     let mut exclude_urls: Vec<String> = vec![];
 
                     // Create client
@@ -147,7 +151,7 @@ impl SpecialFunctions for AgentSolutionArchitect {
                             .iter()
                             .filter(|url| !exclude_urls.contains(&url))
                             .cloned()
-                            .collect(); 
+                            .collect();
                         factsheet.external_urls = Some(new_urls);
                     }
 
@@ -172,7 +176,9 @@ mod tests {
 
     #[tokio::test]
     async fn tests_solution_architect() {
-        println!("===================== (WARNING (TOKIO TEST) COST MONEY: tests_solution_architect) ===================== ");
+        println!(
+            "===================== (WARNING (TOKIO TEST) COST MONEY: tests_solution_architect) ===================== "
+        );
 
         let mut agent: AgentSolutionArchitect = AgentSolutionArchitect::new();
 
@@ -184,17 +190,21 @@ mod tests {
             api_endpoint_schema: None,
     };
 
-    agent
-        .execute(&mut factsheet)
-        .await
-        .expect("Unable to execute Solutions Architect Agent");
-    assert!(factsheet.project_scope != None);
-    assert!(factsheet.external_urls.is_some());
+        agent
+            .execute(&mut factsheet)
+            .await
+            .expect("Unable to execute Solutions Architect Agent");
+        assert!(factsheet.project_scope != None);
+        assert!(factsheet.external_urls.is_some());
 
-    println!(" ===================== PRINT OUR AGENT (tests_solution_architect) ===================== ");
-    dbg!(agent);
+        println!(
+            " ===================== PRINT OUR AGENT (tests_solution_architect) ===================== "
+        );
+        dbg!(agent);
 
-    println!(" ==================== PRINT OUR FACTSHEET (tests_solution_architect) ===================== ");
-    dbg!(factsheet);
+        println!(
+            " ==================== PRINT OUR FACTSHEET (tests_solution_architect) ===================== "
+        );
+        dbg!(factsheet);
     }
 }
