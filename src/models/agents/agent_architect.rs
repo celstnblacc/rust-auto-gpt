@@ -10,9 +10,10 @@ use reqwest::Client;
 use std::time::Duration;
 
 // Solutions Architect
+// 105 1:45
 #[derive(Debug)]
 pub struct AgentSolutionArchitect {
-    attributes: BasicAgent,
+    attributes: BasicAgent
 }
 
 impl AgentSolutionArchitect {
@@ -83,7 +84,7 @@ impl SpecialFunctions for AgentSolutionArchitect {
             match self.attributes.state {
                 // if state is discovery
                 AgentState::Discovery => {
-                    println!(" ==================== AgentState::Discovery (src/models/agents/agent_architects.rs) ===================== ");
+                    println!(" ==================== AgentState::Discovery (src/models/agents/agent_architect.rs) ===================== ");
                     // 107. (5:50)
                     let project_scope: ProjectScope = self.call_project_scope(factsheet).await;
 
@@ -103,7 +104,7 @@ impl SpecialFunctions for AgentSolutionArchitect {
                 // 108.
                 // if state is unit testing
                 AgentState::UnitTesting => { 
-                    println!(" ==================== AgentState::UnitTesting (src/models/agents/agent_architects.rs) ===================== "); // 109. 8:14
+                    println!(" ==================== AgentState::UnitTesting (src/models/agents/agent_architect.rs) ===================== "); // 109. 8:14
                     let mut exclude_urls: Vec<String> = vec![];
 
                     // Create client
