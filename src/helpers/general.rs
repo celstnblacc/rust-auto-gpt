@@ -11,6 +11,9 @@ const EXEC_MAIN_PATH: &str =
     "/Users/macair15/Documents/DevOpsCelstn/RustAutoGPT_UDEMY/web_template/src/main.rs";
 const API_SCHEMA_PATH: &str =
     "/Users/macair15/Documents/DevOpsCelstn/RustAutoGPT_UDEMY/rust-auto-gpt/schemas/api_schema.json";
+pub const WEB_SERVER_PROJECT_PATH: &str =
+    "/Users/macair15/Documents/DevOpsCelstn/RustAutoGPT_UDEMY/web_template";
+
 
 pub fn extend_ai_function(ai_funct: fn(&str) -> &'static str, func_input: &str) -> Message {
     let ai_function_str = ai_funct(func_input);
@@ -111,10 +114,10 @@ pub fn save_backend_code(contents: &String) {
     fs::write(path, contents).expect("Failed to save backend code");
 }
 
-// Save JSON API Endpoint schema
-pub fn save_api_endpoint(api_endpoints: &String) {
-    let path = String::from(API_SCHEMA_PATH);
-    fs::write(path, api_endpoints).expect("Failed to save API schema");
+// Save JSON API Endpoint Schema
+pub fn save_api_endpoints(api_endpoints: &String) {
+    let path: String = String::from(API_SCHEMA_PATH);
+    fs::write(path, api_endpoints).expect("Failed to write API Endpoints to file");
 }
 
 #[cfg(test)]

@@ -56,6 +56,43 @@ pub fn get_user_response(question: &str) -> String {
     response.trim().to_string()
 }
 
+pub fn confirm_safe_code() -> bool {
+    let mut stdout = stdout();
+    loop {
+        
+        //Print the question  in specific color
+        stdout.execute(SetForegroundColor(Color::Blue)).unwrap();
+        print!("");
+        println!("You are about to run code written by an AI.");
+        println!("Review the code before continue.");
+
+        //Reset the color
+        stdout.execute(ResetColor).unwrap();
+
+        //Present the options with different colors
+        stdout.execute(SetForegroundColor(Color::Green)).unwrap();
+        println!("1. Continue (Y/y)");
+        stdout.execute(SetForegroundColor(Color::Red)).unwrap();
+        println!("2. Exit (N/n)");
+        stdout.execute(ResetColor).unwrap();
+
+        //Read the user's response
+        let mut response = String::new();
+        stdin()
+            .read_line(&mut response)
+            .expect("Failed to read user input");
+
+        //Remove the newline character
+        let response = response.trim().to_lowercase();
+
+        match response.as_str() {
+            "1" | "yes" | "y" | "continue" | "c" | "ok" => return true,
+            "2" | "no" | "n" | "exit" | "e" => return false,
+            _ => println!("Invalid input. Please enter 1 or 2."),
+        }  
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
