@@ -5,7 +5,7 @@ use crate::ai_functions::aifunc_backend::{
 
 use crate::helpers::general::{
     read_code_template_contents, read_exec_main_contents, save_backend_code,
-    check_status_code,WEB_SERVER_PROJECT_PATH, save_api_endpoints
+    check_status_code,WEB_SERVER_PROJECT_PATH, DEBUG_MODE, save_api_endpoints
 };
 
 use std::process::{Command, Stdio};
@@ -57,6 +57,11 @@ impl AgentBackendDeveloper {
             code_template_str, factsheet.project_description
         );
 
+        // let msg_context: String = format!(
+        //     "CODE TEMPLATE: {} \n PLEASE OUTPUT ONLY A VALID JSON ARRAY WITHOUT MARKDOWN MARKERS.\n PROJECT_DESCRIPTION: {} \n",
+        //     code_template_str, factsheet.project_description
+        // );
+
         // 9:00
         let ai_response: String = ai_task_request(
             msg_context,
@@ -93,9 +98,13 @@ impl AgentBackendDeveloper {
     // 115. 1:35
     async fn call_extract_rest_api_endpoints(&self) -> String {
         let backend_code: String = read_exec_main_contents();
-
+    
         // Structure message context
         let msg_context: String = format!("CODE_INPUT: {}", backend_code);
+    
+        if DEBUG_MODE{
+            println!("Backend Code: {}", msg_context);
+        }
 
         let ai_response: String = ai_task_request(
             msg_context,
@@ -104,8 +113,13 @@ impl AgentBackendDeveloper {
             print_rest_api_endpoints,
         )
         .await;
-
+    
+        // Clean up markdown markers
         ai_response
+            .trim_start_matches("```json")
+            .trim_start_matches("```")
+            .trim_end_matches("```")
+            .to_string()
     }
 
    // ?
@@ -178,6 +192,9 @@ impl SpecialFunctions for AgentBackendDeveloper {
                     );
 
                     // Build Code
+                    if DEBUG_MODE{
+                        println!("Building backend server...");
+                    }
                     let build_backend_server: std::process::Output = Command::new("cargo")
                         .arg("build")
                         .current_dir(WEB_SERVER_PROJECT_PATH)
@@ -187,7 +204,12 @@ impl SpecialFunctions for AgentBackendDeveloper {
                         .expect("Failed to build backend application");
 
                     // Determine if build errors
+                    if DEBUG_MODE{
+                        println!("Build status: {}", build_backend_server.status);
+                    }
+                        
                     if build_backend_server.status.success() {
+
                         self.bug_count = 0;
                         PrintCommand::UnitTest.print_agent_message(
                             self.attributes.position.as_str(),
@@ -196,7 +218,11 @@ impl SpecialFunctions for AgentBackendDeveloper {
                     } else {
                         let error_arr: Vec<u8> = build_backend_server.stderr;
                         let error_str: String = String::from_utf8(error_arr).unwrap();
-
+                        
+                        if DEBUG_MODE{
+                            println!("Build error: {}", error_str);
+                        }
+    
                         // Update error stats
                         self.bug_count += 1;
                         self.bug_errors = Some(error_str);
@@ -219,13 +245,26 @@ impl SpecialFunctions for AgentBackendDeveloper {
                       Extract and Test
                       Rest API Endpoints
                     */
+                    if DEBUG_MODE{
+                        println!("Extract and Testing Rest API Endpoints...");
+                    }
+
                     // Extract API Endpoints
                     let api_endpoints_str: String = self.call_extract_rest_api_endpoints().await;
-
+                    if DEBUG_MODE {
+                        println!("Extracted API Endpoints: {:?}", api_endpoints_str);
+                    }
+                    
                     // Convert API Endpoints into Values
-                    let api_endpoints: Vec<RouteObject> =
-                        serde_json::from_str(api_endpoints_str.as_str())
-                            .expect("Failed to decode API Endpoints");
+                    let api_endpoints: Vec<RouteObject> = match serde_json::from_str(&api_endpoints_str) {
+                        Ok(endpoints) => endpoints,
+                        Err(e) => panic!("Failed to decode API Endpoints: {:?}", e),
+                    };
+
+                    if let Err(e) = serde_json::from_str::<Vec<RouteObject>>(&api_endpoints_str) {
+                        eprintln!("Invalid JSON response: {}", api_endpoints_str);
+                        panic!("Failed to decode API Endpoints: {:?}", e);
+                    }
 
                     // Define endpoints to check
                     let check_endpoints: Vec<RouteObject> = api_endpoints
@@ -358,7 +397,7 @@ mod tests {
 
         let factsheet_str_02: &str = r#"
         {
-        "project_description": "Build a website that only tracks and returnsthe time of day",
+        "project_description": "Build a website that only tracks and returns the time of day",
         "project_scope": {
             "is_crud_required": false,
             "is_user_login_and_logout": false,
@@ -370,10 +409,25 @@ mod tests {
         }
         "#;
 
-        let mut factsheet: FactSheet = serde_json::from_str(factsheet_str_02).unwrap();
+        let factsheet_str_03: &str = r#"
+        {
+        "project_description": "Build a website which only returns the time. Use some strange library that i never heard of.",
+        "project_scope": {
+            "is_crud_required": false,
+            "is_user_login_and_logout": false,
+            "is_external_urls_required": false
+        },
+        "external_urls": [],
+        "backend_code": null,
+        "api_endpoint_schema": null
+        }
+        "#;
 
-        agent.attributes.state = AgentState::UnitTesting; // 121 0:35
-        // agent.attributes.state = AgentState::Discovery;
+
+        let mut factsheet: FactSheet = serde_json::from_str(factsheet_str_03).unwrap();
+
+        // agent.attributes.state = AgentState::UnitTesting;
+        agent.attributes.state = AgentState::Discovery;
         agent
             .execute(&mut factsheet)
             .await

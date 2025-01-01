@@ -5,6 +5,8 @@ use reqwest::Client;
 use serde::de::DeserializeOwned;
 use std::fs;
 
+pub const DEBUG_MODE : bool = true;
+
 const CODE_TEMPLATE_PATH: &str =
     "/Users/macair15/Documents/DevOpsCelstn/RustAutoGPT_UDEMY/web_template/src/code_template.rs";
 const EXEC_MAIN_PATH: &str =
@@ -110,8 +112,15 @@ pub fn read_exec_main_contents() -> String {
 
 // Save new backend code
 pub fn save_backend_code(contents: &String) {
+    // Clean up markdown markers
+    let cleaned_contents = contents
+        .trim_start_matches("```rust")
+        .trim_start_matches("```")
+        .trim_end_matches("```");
+
+    // Write to the file
     let path = String::from(EXEC_MAIN_PATH);
-    fs::write(path, contents).expect("Failed to save backend code");
+    fs::write(path, cleaned_contents).expect("Failed to save backend code");
 }
 
 // Save JSON API Endpoint Schema
