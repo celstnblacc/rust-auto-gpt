@@ -1,68 +1,35 @@
 
 [
   {
-    "route": "/progress",
-    "is_route_dynamic": "false",
-    "method": "post",
-    "request_body": {
-      "id": "number",
-      "user_id": "number",
-      "date": "string",
-      "timezone": "string",
-      "steps": "number",
-      "calories_burned": "number"
-    },
-    "response": "None"
-  },
-  {
-    "route": "/progress/{id}",
+    "route": "/forex/{symbol}",
     "is_route_dynamic": "true",
     "method": "get",
     "request_body": "None",
     "response": {
-      "id": "number",
-      "user_id": "number",
-      "date": "string",
-      "timezone": "string",
-      "steps": "number",
-      "calories_burned": "number"
+      "symbol": "string",
+      "price": "number"
     }
   },
   {
-    "route": "/progress",
+    "route": "/forex",
     "is_route_dynamic": "false",
     "method": "get",
     "request_body": "None",
     "response": [
       {
-        "id": "number",
-        "user_id": "number",
-        "date": "string",
-        "timezone": "string",
-        "steps": "number",
-        "calories_burned": "number"
+        "symbol": "string",
+        "price": "number"
       }
     ]
   },
   {
-    "route": "/progress",
+    "route": "/forex",
     "is_route_dynamic": "false",
     "method": "put",
     "request_body": {
-      "id": "number",
-      "user_id": "number",
-      "date": "string",
-      "timezone": "string",
-      "steps": "number",
-      "calories_burned": "number"
+      "symbol": "string",
+      "price": "number"
     },
-    "response": "None"
-  },
-  {
-    "route": "/progress/{id}",
-    "is_route_dynamic": "true",
-    "method": "delete",
-    "request_body": "None",
     "response": "None"
   }
 ]

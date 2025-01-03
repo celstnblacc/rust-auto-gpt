@@ -1,10 +1,11 @@
 use crate::models::agent_basic::basic_agent::{AgentState, BasicAgent};
-use crate::models::agents::agent_architect::AgentSolutionArchitect;
 use crate::models::agents::agent_traits::{FactSheet, SpecialFunctions};
 
 use crate::ai_functions::aifunc_managing::convert_user_input_to_goal;
 use crate::helpers::general::ai_task_request;
-// use crate::models::agents::agent_backend::AgentBackendDeveloper;
+
+use crate::models::agents::agent_architect::AgentSolutionArchitect;
+use crate::models::agents::agent_backend::AgentBackendDeveloper;
 
 #[derive(Debug)]
 pub struct ManagingAgent {
@@ -58,7 +59,8 @@ impl ManagingAgent {
     // 111. 1:15
     fn create_agents(&mut self) {
         self.add_agent(Box::new(AgentSolutionArchitect::new()));
-        //self.add_agent(Box::new(AgentBackendDeveloper::new()));
+        self.add_agent(Box::new(AgentBackendDeveloper::new())); // 124.
+        // Add agent for front end
     }
 
     pub async fn execute_project(&mut self) {
@@ -68,8 +70,9 @@ impl ManagingAgent {
             let _agent_res: Result<(), Box<dyn std::error::Error>> =
                 agent.execute(&mut self.factsheet).await;
 
-            let agent_info: &BasicAgent = agent.get_attributes_from_agent();
-            dbg!(agent_info);
+            // 124. 2:35 hide to run
+            // let agent_info: &BasicAgent = agent.get_attributes_from_agent();
+            // dbg!(agent_info);
         }
     }
 }
